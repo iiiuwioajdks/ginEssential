@@ -9,6 +9,7 @@ import (
 var DB *gorm.DB
 
 func InitDB() *gorm.DB {
+
 	dsn := "root:123456@(localhost:3306)/gin_vue_demo?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
