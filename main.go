@@ -4,13 +4,14 @@ import (
 	"Gin_Vue_Demo/common"
 	"Gin_Vue_Demo/routers"
 	"github.com/gin-gonic/gin"
-	"io"
+	"github.com/spf13/viper"
 	"os"
 )
 
 func main() {
-	f, _ := os.Create("gin.log")
-	gin.DefaultWriter = io.MultiWriter(f)
+	InitConfig()
+	//f, _ := os.Create("gin.log")
+	//gin.DefaultWriter = io.MultiWriter(f)
 
 	common.InitDB()
 
@@ -18,5 +19,18 @@ func main() {
 
 	r = routers.CollectRoute(r)
 
-	panic(r.Run(":9090"))
+	port := viper.GetString("server.port")
+
+	panic(r.Run(":" + port))
+}
+
+func InitConfig() {
+	workDir, _ := os.Getwd()
+	viper.SetConfigName("application")
+	viper.SetConfigType("yml")
+	viper.AddConfigPath(workDir + "/config")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
 }

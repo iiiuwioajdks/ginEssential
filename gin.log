@@ -1,0 +1,11 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/auth/register        --> Gin_Vue_Demo/controller.Register (3 handlers)
+[GIN-debug] POST   /api/auth/login           --> Gin_Vue_Demo/controller.Login (3 handlers)
+[GIN-debug] GET    /api/auth/info            --> Gin_Vue_Demo/controller.Info (4 handlers)
+[GIN-debug] Listening and serving HTTP on :9090
+[GIN] 2021/08/11 - 22:54:17 | 200 |            0s |             ::1 | POST     "/api/auth/register"

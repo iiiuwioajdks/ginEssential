@@ -3,6 +3,7 @@ package middleware
 import (
 	"Gin_Vue_Demo/common"
 	"Gin_Vue_Demo/model"
+	"Gin_Vue_Demo/response"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -17,10 +18,7 @@ func AuthMiddleWare() gin.HandlerFunc {
 		tokenString := c.GetHeader("Authorization")
 
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer") {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
-			})
+			response.Response(c, http.StatusUnauthorized, 401, nil, "权限不足")
 			c.Abort()
 			return
 		}
@@ -30,25 +28,19 @@ func AuthMiddleWare() gin.HandlerFunc {
 		// 如果 error 或者 token 无效，返回权限不足
 		token, claims, err := common.ParseToken(tokenString)
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
-			})
+			response.Response(c, http.StatusUnauthorized, 401, nil, "权限不足")
 			c.Abort()
 			return
 		}
 
-		// 验证通过后获取 claim 中的 userId
+		// 验证通过后获取 claim 中的 userId，也就是用户数据库里面的 id
 		userId := claims.UserId
 		DB := common.GetDB()
 		var user model.User
 		DB.First(&user, userId)
 
 		if user.ID == 0 {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
-			})
+			response.Response(c, http.StatusUnauthorized, 401, nil, "权限不足")
 			c.Abort()
 			return
 		}
