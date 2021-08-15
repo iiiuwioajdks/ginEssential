@@ -29,8 +29,10 @@ func Info(c *gin.Context) {
 func Login(c *gin.Context) {
 	db := common.GetDB()
 	// 获取参数
-	telephone := c.PostForm("telephone")
-	password := c.PostForm("password")
+	userWeb := model.User{}
+	c.Bind(&userWeb)
+	telephone := userWeb.Telephone
+	password := userWeb.Password
 
 	// 数据验证
 	if len(telephone) != 11 {
@@ -64,14 +66,19 @@ func Login(c *gin.Context) {
 	}
 
 	// 返回结果
-	response.Success(c, http.StatusOK, 200, gin.H{"token": token}, "登录成功")
+	response.Success(c, gin.H{"token": token}, "登录成功")
 }
 func Register(c *gin.Context) {
 	db := common.GetDB()
+
+	// 获取请求参数
+	var requestUser = model.User{}
+	c.Bind(&requestUser)
 	// 获取参数
-	name := c.PostForm("name")
-	telephone := c.PostForm("telephone")
-	password := c.PostForm("password")
+	name := requestUser.Name
+	telephone := requestUser.Telephone
+	password := requestUser.Password
+
 	// 数据验证
 	// 数据验证
 	if len(telephone) != 11 {
@@ -107,8 +114,17 @@ func Register(c *gin.Context) {
 		Password:  string(hashedPassword),
 	}
 	db.Create(&newUser)
+
+	// 发放token
+	token, err := common.ReleaseToken(newUser)
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, 500, nil, "系统异常")
+		log.Printf("token generate error: %v", err)
+		return
+	}
+
 	// 返回结果
-	response.Success(c, http.StatusOK, 200, nil, "注册成功")
+	response.Success(c, gin.H{"token": token}, "注册成功")
 }
 
 func isTelephoneExist(db *gorm.DB, telephone string) bool {
